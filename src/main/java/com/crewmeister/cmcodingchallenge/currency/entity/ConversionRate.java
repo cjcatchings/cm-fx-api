@@ -9,6 +9,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * The ConversionRate entity that will contain the following columns
+ * - CURRENCY_ID - the foreign key to the CURRENCY for this given conversion rate
+ * - DATE - the day for the given conversion rate for this currency
+ * - RATE - the rate (converted from Euros) for this currency on this date
+ */
 @Entity
 @IdClass(ConversionRateKey.class)
 @Data

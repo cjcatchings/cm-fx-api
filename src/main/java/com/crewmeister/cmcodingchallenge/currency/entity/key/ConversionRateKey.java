@@ -10,6 +10,10 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * A composite key for the ConversionRate entity/table that
+ * declares teh Currency and Date as the primary key
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode

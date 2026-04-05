@@ -7,6 +7,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * A generic Spring Batch Job Notification Listener that reports the database load job
+ * as completed or failed
+ */
 @Component
 public class JobCompletionNotificationListener implements JobExecutionListener {
 
