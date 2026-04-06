@@ -55,6 +55,12 @@ To run the application, execute the following:
 
 This will start an H2 database and execute a Spring Batch job that loads currencies in `src/main/resources/currencies.csv` as well as exchange rates in CSV files in the `src/main/resources/exchangerates` folder.
 
+If you want to limit the maximum number of results returned from the `/api/currencies/{code}` endpoint, run the following command:
+
+`mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dcrewmeister.getrates.maxresults=30"`
+
+This limits the maximum number of results returned from the `/api/currencies/{code}` endpoint to 30
+
 To execute unit tests for this application, run the following:
 
 `mvn test`
@@ -96,6 +102,10 @@ This endpoint retrieves daily historical conversion rates from one (1) Euro to t
 
 The following input is required:
  - `code` - A path variable that represents the requested 3-letter currency code (ex. `USD`)
+
+The following inputs are optional:
+ - `from` - An optional `ReqeustParam` variable that indicates the earliest date from which to retrieve conversion rates
+ - `to` - An optional `RequestParam` variable that indicates the latest date to which to retrieve conversion rates
 
 The output is returned in the following format:
 ```

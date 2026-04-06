@@ -77,14 +77,20 @@ public class CurrencyController {
      * @return A list of conversion rate objects by date (yyyy-MM-dd) and rate from Euros to the given currency
      */
     @GetMapping("/currencies/{code}")
-    public ResponseEntity<List<ConversionRateDto>> getConversionRatesForCurrency(@PathVariable String code) {
+    public ResponseEntity<List<ConversionRateDto>> getConversionRatesForCurrency(
+            @PathVariable String code,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to
+    ) {
         log.debug("Entering getConversionRatesForCurrency");
         try {
             currencyService.getCurrencyByCode(code);
         } catch (CurrencyNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Currency '%s' not found", code));
         }
-        List<ConversionRate> conversionRates = new ArrayList<>(conversionRateService.getByCurrencyCode(code));
+        List<ConversionRate> conversionRates = new ArrayList<>(
+                conversionRateService.getByCurrencyCode(code, from, to)
+        );
         List<ConversionRateDto> conversionRatesDto = conversionRates.stream().map(ConversionRateMapper.INSTANCE::conversionRateToConversionRateDto).toList();
         log.debug("Exiting getConversionRatesForCurrency");
         return new ResponseEntity<>(conversionRatesDto, HttpStatus.OK);

@@ -5,17 +5,28 @@ import com.crewmeister.cmcodingchallenge.currency.exception.ConversionRateNotFou
 import com.crewmeister.cmcodingchallenge.currency.repository.ConversionRateRepository;
 import com.crewmeister.cmcodingchallenge.currency.service.ConversionRateService;
 import com.crewmeister.cmcodingchallenge.currency.util.FormatUtil;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
+import static com.crewmeister.cmcodingchallenge.currency.repository.spec.ConversionRateSpecification.*;
+
 /**
  * A Spring Boot service layer abstraction to retrieve conversion rate information
  */
 @Service
 public class ConversionRateServiceImpl implements ConversionRateService {
+
+    @Value("${crewmeister.getrates.maxresults:#{null}}")
+    private Integer maxResultsForGetRates;
 
     private final ConversionRateRepository conversionRateRepository;
 
@@ -30,11 +41,49 @@ public class ConversionRateServiceImpl implements ConversionRateService {
     /**
      * Retrieves daily conversion rates for a given currency by currency code
      * @param code The 3-letter currency code for which to retrieve conversion rates (from EUR to given currency)
+     * @param from The earliest date (in yyyy-MM-dd) from which to retrieve conversion rates for this currency
+     * @param to The latest date (in yyyy-MM-dd) from which to retrieve conversion rates for this currency
      * @return A list of conversion rates for the given currency
      */
     @Override
-    public List<ConversionRate> getByCurrencyCode(String code) {
-        return conversionRateRepository.getConversionRatesByCurrency_CurrencyCodeOrderByDateDesc(code);
+    public List<ConversionRate> getByCurrencyCode(String code, String from, String to) {
+        Date fromDateObj = FormatUtil.convertDateStringToDateOrNull(from);
+        Date toDateObj = calculateToDateIfOnlyFromDateProvided(
+                fromDateObj,
+                FormatUtil.convertDateStringToDateOrNull(to)
+        );
+
+        Specification<ConversionRate> spec = Specification
+                .where(hasCurrencyCode(code))
+                .and(fromDate(fromDateObj))
+                .and(toDate(toDateObj));
+
+        if (maxResultsForGetRates != null) {
+            Pageable pageable = PageRequest.of(
+                    0,
+                    maxResultsForGetRates,
+                    Sort.by(Sort.Direction.DESC, "date")
+            );
+            return conversionRateRepository.findAll(spec, pageable);
+        }
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "date");
+        return conversionRateRepository.findAll(spec, sort);
+    }
+
+    /**
+     * If an "from" date is provided with no to date, this method will calculate a
+     * to date to provide maxResultsForGetRates ConversionRates from the provided
+     * fromDate
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    private Date calculateToDateIfOnlyFromDateProvided(Date fromDate, Date toDate) {
+        if (fromDate == null || toDate != null || maxResultsForGetRates == null) {
+            return toDate;
+        }
+        return DateUtils.addDays(fromDate, maxResultsForGetRates);
     }
 
     /**
@@ -48,7 +97,7 @@ public class ConversionRateServiceImpl implements ConversionRateService {
      */
     @Override
     public ConversionRate getByCurrencyCodeAndDate(String code, String date) throws ConversionRateNotFoundException, ParseException {
-        Date dateObj = FormatUtil.convertDateStringToCalendar(date);
+        Date dateObj = FormatUtil.convertDateStringToDate(date);
         ConversionRate rate = conversionRateRepository.getConversionRateByCurrency_CurrencyCodeAndDate(code, dateObj);
         if(rate == null) {
             throw new ConversionRateNotFoundException();

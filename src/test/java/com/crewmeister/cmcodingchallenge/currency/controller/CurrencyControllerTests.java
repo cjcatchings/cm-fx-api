@@ -39,7 +39,7 @@ public class CurrencyControllerTests {
         String currencyCodeUsd = "USD";
         Integer expectedConversionRates = 6978;
         // When
-        ResponseEntity<List<ConversionRateDto>> response = currencyController.getConversionRatesForCurrency(currencyCodeUsd);
+        ResponseEntity<List<ConversionRateDto>> response = currencyController.getConversionRatesForCurrency(currencyCodeUsd, null, null);
 
         // Then
         assertNotNull(response.getBody());
@@ -52,7 +52,7 @@ public class CurrencyControllerTests {
         String currencyCodeArs= "ARS";
         // When
         assertThrows(ResponseStatusException.class, () -> {
-            ResponseEntity<List<ConversionRateDto>> response = currencyController.getConversionRatesForCurrency(currencyCodeArs);
+            ResponseEntity<List<ConversionRateDto>> response = currencyController.getConversionRatesForCurrency(currencyCodeArs, null, null);
             // Then exception thrown
             assertEquals(HttpStatusCode.valueOf(404), response.getStatusCode());
         });

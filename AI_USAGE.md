@@ -105,6 +105,19 @@ The processor for USD seems to be loading some values from the AUD file.
 Claude's response to the last prompt led me to use `java.util.Map.computeIfAbsent` in `ConversionRateLoaderProcessor` as it appeared there was a race condition when 
 loading conversion rate files in parallel.  I decided to store a persistent map for currency code to Currency entity so that each ConversionRate record became properly mapped to the corresponding Currency.
 
+```
+I have a Spring boot service method that needs to query a table of conversion rates with an optional 
+from date and an optional to date.  I currently have a repository method getConversionRatesByCurrency_CurrencyCodeOrderByDateDesc.  
+How would I implement this in a JPA repository method?
+```
+
+I gave Claude this prompt in order to add a stretch goal for paging for the `/api/currencies/{code}` endpoint.  
+
+It recommended using a `Specification` implementation which I added to the application and applied to the corresponding 
+service method.  I had to make a few adjustments to the repository, including adding a pair of `findAll` functions to get the 
+query to execute with JPA Specification and Pagination as expected.  The Specification output appeared useful so I added that to 
+my application after a proper review of the code.
+
 ## Summary
 
 As mentioned, I used LLMs for this project to verify the project skeleton and provide additional guidance on utilizing Spring Batch to load currency and conversion rate data at server startup.  However, even in these cases, the vast 

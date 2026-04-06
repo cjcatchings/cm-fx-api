@@ -14,9 +14,11 @@ public interface ConversionRateService {
     /**
      * Retrieves daily conversion rates for a given currency by currency code
      * @param code The 3-letter currency code for which to retrieve conversion rates (from EUR to given currency)
+     * @param from The earliest date (in yyyy-MM-dd) from which to retrieve conversion rates for this currency
+     * @param to The latest date (in yyyy-MM-dd) from which to retrieve conversion rates for this currency
      * @return A list of conversion rates for the given currency
      */
-    List<ConversionRate> getByCurrencyCode(String code);
+    List<ConversionRate> getByCurrencyCode(String code, String from, String to);
 
     /**
      * Retrieves the conversion rate for a given currency by currency code on a given date in (yyyy-MM-dd format).

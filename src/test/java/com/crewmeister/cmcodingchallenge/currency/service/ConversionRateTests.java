@@ -23,7 +23,7 @@ public class ConversionRateTests {
         String currencyCodeUsd = "USD";
 
         // When
-        List<ConversionRate> usdConversionRates = conversionRateService.getByCurrencyCode(currencyCodeUsd);
+        List<ConversionRate> usdConversionRates = conversionRateService.getByCurrencyCode(currencyCodeUsd, null, null);
 
         // Then
         assertEquals(6978, usdConversionRates.size());
@@ -42,4 +42,5 @@ public class ConversionRateTests {
         // Then
         assertEquals(expectedRate, usdConversionRate.getRate());
     }
+
 }
